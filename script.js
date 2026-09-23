@@ -90,10 +90,9 @@
   /* ---------- Hero typing effect ---------- */
   const typingEl = document.getElementById("typingText");
   const roles = [
-    "Golang backend engineer",
-    "Btrust Builders fellow",
-    "Bitcoin & Lightning tinkerer",
-    "Rust learner, BDK-bound",
+    "Software developer, 6+ years",
+    "Btrust Builder",
+    "Bitcoin protocol contributor",
     "Writer on protocol internals",
   ];
 
@@ -143,10 +142,8 @@
       if (priceRes.ok) {
         const data = await priceRes.json();
         const price = data?.bitcoin?.usd;
-        if (btcPriceEl && price) {
-          btcPriceEl.textContent = "$" + price.toLocaleString("en-US");
-        } else if (btcPriceEl) {
-          btcPriceEl.textContent = "unavailable";
+        if (btcPriceEl) {
+          btcPriceEl.textContent = Number.isFinite(price) ? "$" + price.toLocaleString("en-US") : "unavailable";
         }
       } else if (btcPriceEl) {
         btcPriceEl.textContent = "unavailable";
@@ -158,8 +155,8 @@
     try {
       const heightRes = await fetchWithTimeout("https://mempool.space/api/blocks/tip/height");
       if (heightRes.ok) {
-        const height = await heightRes.text();
-        if (btcHeightEl) btcHeightEl.textContent = Number(height).toLocaleString("en-US");
+        const height = Number((await heightRes.text()).trim());
+        if (btcHeightEl) btcHeightEl.textContent = Number.isFinite(height) ? height.toLocaleString("en-US") : "unavailable";
       } else if (btcHeightEl) {
         btcHeightEl.textContent = "unavailable";
       }
