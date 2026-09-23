@@ -132,6 +132,7 @@ a:hover { text-decoration: underline; }
   letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 18px;
 }
 .hero h1 { font-size: clamp(2.2rem, 5vw, 3.6rem); max-width: 16ch; }
+.hero h1 { font-size: clamp(2.2rem, 5vw, 3.6rem); max-width: 20ch; }
 .hero-typing { font-size: 1.1rem; color: var(--text-dim); min-height: 1.6em; }
 .typing-caret { color: var(--accent); animation: blink 1s steps(1) infinite; }
 .hero-lede { max-width: 62ch; font-size: 1.05rem; }
