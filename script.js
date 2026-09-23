@@ -247,6 +247,79 @@
     }
   });
 
+  /* ---------- Contact form submit & reset ---------- */
+  const contactForm = document.getElementById("contactForm");
+  const contactStatus = document.getElementById("contactStatus");
+  const contactSubmitBtn = contactForm?.querySelector('button[type="submit"]');
+
+  contactForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!contactSubmitBtn) return;
+
+    const originalBtnText = contactSubmitBtn.textContent;
+    contactSubmitBtn.disabled = true;
+    contactSubmitBtn.textContent = "Sending…";
+
+    if (contactStatus) {
+      contactStatus.className = "form-status";
+      contactStatus.textContent = "";
+      contactStatus.hidden = true;
+    }
+
+    try {
+      const response = await fetch(contactForm.action, {
+        method: contactForm.method || "POST",
+        body: new FormData(contactForm),
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
+      if (response.ok) {
+        contactForm.reset();
+        if (contactStatus) {
+          contactStatus.textContent = "Thanks! Your message has been sent successfully.";
+          contactStatus.className = "form-status is-success";
+          contactStatus.hidden = false;
+        }
+      } else {
+        const data = await response.json().catch(() => null);
+        let errorMsg = "Oops! There was a problem sending your message. Please try again.";
+        if (data && Array.isArray(data.errors) && data.errors.length > 0) {
+          errorMsg = data.errors.map((err) => err.message).join(", ");
+        }
+        if (contactStatus) {
+          contactStatus.textContent = errorMsg;
+          contactStatus.className = "form-status is-error";
+          contactStatus.hidden = false;
+        }
+      }
+    } catch (_) {
+      if (contactStatus) {
+        contactStatus.textContent = "Network error. Please check your connection or reach out directly at yemmyharry@gmail.com.";
+        contactStatus.className = "form-status is-error";
+        contactStatus.hidden = false;
+      }
+    } finally {
+      contactSubmitBtn.disabled = false;
+      contactSubmitBtn.textContent = originalBtnText;
+    }
+  });
+
+  contactForm?.addEventListener("input", () => {
+    if (contactStatus && contactStatus.classList.contains("is-success")) {
+      contactStatus.className = "form-status";
+      contactStatus.textContent = "";
+      contactStatus.hidden = true;
+    }
+  });
+
+  window.addEventListener("pageshow", (event) => {
+    if (event.persisted) {
+      contactForm?.reset();
+    }
+  });
+
   /* ---------- Back to top ---------- */
   const backToTop = document.getElementById("backToTop");
   window.addEventListener("scroll", () => {
