@@ -284,9 +284,7 @@ a:hover { text-decoration: underline; }
 
 /* ---------- Contact ---------- */
 .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
-.contact-email-row { display: flex; align-items: center; gap: 12px; margin: 18px 0 22px; }
-.contact-email-row code { font-size: 1rem; color: var(--accent-2); }
-.contact-socials { margin-top: 4px; }
+.contact-socials { margin-top: 8px; }
 .contact-form { display: grid; gap: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px; }
 .contact-form label { display: grid; gap: 6px; font-size: 0.85rem; color: var(--text-dim); }
 .contact-form input, .contact-form textarea {

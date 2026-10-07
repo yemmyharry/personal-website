@@ -232,21 +232,6 @@
   });
   updateHash();
 
-  /* ---------- Copy email ---------- */
-  const copyEmailBtn = document.getElementById("copyEmailBtn");
-  const emailText = document.getElementById("emailText");
-
-  copyEmailBtn?.addEventListener("click", async () => {
-    try {
-      await navigator.clipboard.writeText(emailText?.textContent?.trim() ?? "");
-      const original = copyEmailBtn.textContent;
-      copyEmailBtn.textContent = "Copied!";
-      setTimeout(() => (copyEmailBtn.textContent = original), 1600);
-    } catch (_) {
-      /* clipboard API unavailable — user can select the text manually */
-    }
-  });
-
   /* ---------- Contact form submit & reset ---------- */
   const contactForm = document.getElementById("contactForm");
   const contactStatus = document.getElementById("contactStatus");
@@ -296,7 +281,7 @@
       }
     } catch (_) {
       if (contactStatus) {
-        contactStatus.textContent = "Network error. Please check your connection or reach out directly at yemmyharry@gmail.com.";
+        contactStatus.textContent = "Network error. Please check your connection and try again.";
         contactStatus.className = "form-status is-error";
         contactStatus.hidden = false;
       }
