@@ -204,6 +204,21 @@
     <div class="container">
       <h2 class="section-title reveal"><span class="tag-mono">02</span> Experience</h2>
       <div class="timeline">
+        <article class="timeline-item reveal">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <div class="timeline-head">
+              <h3>Founder &amp; Developer (Golang &amp; React)</h3>
+              <span class="timeline-org">Ipilẹ Labs</span>
+              <span class="timeline-date">2026 to Present</span>
+            </div>
+            <ul>
+              <li>Building a Bitcoin &amp; Lightning wallet across WhatsApp, Telegram, and a React PWA on Signet.</li>
+              <li>Engineered Go backend with an audited Postgres ledger, natural-language commands, and Redis rate caching.</li>
+              <li>Integrated Lightning via Voltage for real-time payments across Lightning addresses, LNURL, and BOLT11 invoices.</li>
+            </ul>
+          </div>
+        </article>
 
         <article class="timeline-item reveal">
           <div class="timeline-dot"></div>
@@ -334,10 +349,12 @@
         <div class="skill-card reveal">
           <h3>Bitcoin &amp; Lightning</h3>
           <div class="pill-row">
-            <span class="pill pill-accent">btcd</span><span class="pill pill-accent">Lightning / Zeus LN</span>
-            <span class="pill pill-accent">Fedimint</span><span class="pill pill-accent">BIPs (32/39/44)</span>
-            <span class="pill pill-accent">Bitcoin Lightning payments</span>
-            <span class="pill pill-accent">Custodial ledger &amp; escrow</span>
+            <span class="pill pill-accent">btcd</span><span class="pill pill-accent">Lightning / Voltage</span>
+            <span class="pill pill-accent">Zeus LN</span><span class="pill pill-accent">Fedimint</span>
+            <span class="pill pill-accent">BIPs (32/39/44)</span>
+            <span class="pill pill-accent">LNURL &amp; Lightning Addresses</span>
+            <span class="pill pill-accent">Custodial ledgers &amp; escrow</span>
+            <span class="pill pill-learning">BDK / rust-bitcoin (OSS)</span>
           </div>
         </div>
         <div class="skill-card reveal">
@@ -398,10 +415,10 @@
             <h3>Ipilẹ Labs</h3>
             <span class="project-stack mono">Go · React · Postgres · Lightning</span>
           </div>
-          <p>A Bitcoin &amp; Lightning wallet inside WhatsApp, Telegram, and a web app, one account
-             across all three. Send in plain words, cash out to bank or mobile money, and run
-             business accounts with payment links, API keys, team roles, and bulk payments.
-             Marketplace escrow and a ledger audit keep every sat accounted for.
+          <p>A Bitcoin &amp; Lightning wallet accessible across WhatsApp, Telegram, and a React PWA,
+             with one account across all three. Send in plain words, generate Lightning addresses and LNURL
+             withdrawals, and manage business accounts with payment links, API keys, and team roles.
+             Marketplace escrow, continuous ledger audits, and an admin solvency check keep every sat accounted for.
              Beta on Signet.
              <a href="https://ipile-labs.up.railway.app/" target="_blank" rel="noopener">Try it live &rarr;</a></p>
         </article>
@@ -513,7 +530,7 @@
         </div>
         <div class="journey-item reveal">
           <h3>Building: Ipilẹ Labs</h3>
-          <p>Shipping a beta Bitcoin &amp; Lightning wallet for African consumers and businesses, from the Go backend to the web app.</p>
+          <p>Shipping a beta Bitcoin &amp; Lightning wallet on Signet for African users and businesses across WhatsApp, Telegram, and the web, powered by a Go backend, audited Postgres ledger, and Voltage Lightning nodes.</p>
         </div>
       </div>
     </div>
