@@ -88,12 +88,11 @@
   }
 
   /* ---------- Hero typing effect ---------- */
-  const typingEl = document.getElementById("typingText");
   const roles = [
-    "Software developer, 6+ years",
-    "Btrust Builder",
+    "Programming since 2018",
+    "Btrust Builder & Chaperone",
     "Bitcoin protocol contributor",
-    "Writer on protocol internals",
+    "Full-stack & Go systems engineer",
   ];
 
   if (typingEl) {
