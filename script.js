@@ -88,9 +88,11 @@
   }
 
   /* ---------- Hero typing effect ---------- */
+  const typingEl = document.getElementById("typingText");
   const roles = [
-    "Programming since 2018",
-    "Btrust Builder & Chaperone",
+    "Software Engineer, 7+ yrs",
+    "Protocol Engineer",
+    "Btrust Builder",
     "Bitcoin protocol contributor",
     "Full-stack & Go systems engineer",
   ];
