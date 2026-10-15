@@ -90,6 +90,7 @@
   /* ---------- Hero typing effect ---------- */
   const typingEl = document.getElementById("typingText");
   const roles = [
+    "Founder, Ipilẹ Wallet",
     "Software Engineer, 7+ yrs",
     "Protocol Engineer",
     "Btrust Builder",
