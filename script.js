@@ -217,52 +217,122 @@
   let eventCount = 0;
   let paymentCount = 0;
   let duplicateCount = 0;
-  let lastId = null;
+  let paymentSequence = 0;
+  let lastEvent = null;
+  let currentPayment = null;
+  let pendingDelivery = null;
   let startTime = Date.now();
   const processed = new Set();
   const replay = document.getElementById("replayEvent");
-  function logEvent(level, text, duplicate) {
+  const retry = document.getElementById("retryPayment");
+  const scenarioButtons = ["sendEvent", "delayEvent", "outOfOrderEvent", "failEvent"].map((id) => document.getElementById(id));
+  function logEvent(level, text, warning = false) {
     const elapsed = Math.floor((Date.now() - startTime) / 1000);
     const time = String(Math.floor(elapsed / 60)).padStart(2, "0") + ":" + String(elapsed % 60).padStart(2, "0");
     const line = createElement("div", undefined, "log-line");
-    line.append(createElement("span", time, "log-time"), createElement("span", level, "log-info" + (duplicate ? " duplicate" : "")), createElement("span", text));
+    line.append(createElement("span", time, "log-time"), createElement("span", level, "log-info" + (warning ? " duplicate" : "")), createElement("span", text));
     log.append(line);
     while (log.children.length > 35) log.firstElementChild.remove();
     log.scrollTop = log.scrollHeight;
   }
-  function processEvent(id) {
-    eventCount++;
-    logEvent("RECEIVE", id + " · payment.succeeded");
-    if (processed.has(id)) {
-      duplicateCount++;
-      logEvent("SKIP", "Event ID already processed. No second payment.", true);
-      document.getElementById("consoleState").textContent = "DUPLICATE SKIPPED";
-    } else {
-      processed.add(id);
-      paymentCount++;
-      logEvent("COMMIT", "Event marked processed; one payment recorded.");
-      document.getElementById("consoleState").textContent = "PAYMENT RECORDED";
-    }
+  function showOutcome(state, text) {
+    document.getElementById("consoleState").textContent = state;
+    document.getElementById("paymentState").textContent = currentPayment ? currentPayment.status.toUpperCase() : "NONE";
+    document.getElementById("scenarioOutcome").textContent = text;
+  }
+  function updateControls() {
+    scenarioButtons.forEach((button) => { button.disabled = pendingDelivery !== null; });
+    replay.disabled = !lastEvent || pendingDelivery !== null;
+    retry.disabled = !currentPayment || currentPayment.status !== "failed" || pendingDelivery !== null;
     document.getElementById("eventCount").textContent = eventCount;
     document.getElementById("paymentCount").textContent = paymentCount;
     document.getElementById("duplicateCount").textContent = duplicateCount;
   }
+  function beginPayment() {
+    currentPayment = { id: "pay_demo_" + String(++paymentSequence).padStart(3, "0"), status: "pending", version: 0, recorded: false };
+    lastEvent = null;
+    logEvent("CREATE", currentPayment.id + " · payment pending");
+    updateControls();
+  }
+  function sampleEvent(status, version) {
+    return { id: "evt_" + currentPayment.id + "_" + version, paymentId: currentPayment.id, status, version };
+  }
+  function processEvent(event) {
+    lastEvent = event;
+    eventCount++;
+    logEvent("RECEIVE", event.id + " · payment." + event.status);
+    if (processed.has(event.id)) {
+      duplicateCount++;
+      logEvent("SKIP", "Event ID already processed. No payment state or balance change.", true);
+      showOutcome("DUPLICATE SKIPPED", "The repeated event was ignored. The payment and recorded total stay unchanged.");
+    } else {
+      processed.add(event.id);
+      // This sketch uses provider-supplied versions to recognise older events.
+      if (event.version <= currentPayment.version || currentPayment.status === "succeeded") {
+        logEvent("STALE", "Older event ignored. A confirmed payment cannot move back to pending or failed.", true);
+        showOutcome("STALE EVENT IGNORED", "Success arrived first. The older pending event cannot undo it or record another payment.");
+      } else {
+        currentPayment.version = event.version;
+        currentPayment.status = event.status;
+        if (event.status === "succeeded") {
+          if (!currentPayment.recorded) {
+            currentPayment.recorded = true;
+            paymentCount++;
+          }
+          logEvent("COMMIT", event.paymentId + " · confirmed; one payment recorded.");
+          showOutcome("PAYMENT RECORDED", "Confirmation received. This payment is recorded once, even if its event is replayed.");
+        } else if (event.status === "failed") {
+          logEvent("FAIL", "Attempt declined. No payment recorded; a new attempt can be made.", true);
+          showOutcome("PAYMENT FAILED", "The attempt failed and no payment was recorded. Try a new attempt with “Retry failed payment”.");
+        }
+      }
+    }
+    updateControls();
+  }
   document.getElementById("sendEvent").addEventListener("click", () => {
-    lastId = "evt_demo_" + String(paymentCount + 1).padStart(3, "0");
-    processEvent(lastId);
-    replay.disabled = false;
+    beginPayment();
+    processEvent(sampleEvent("succeeded", 1));
   });
-  replay.addEventListener("click", () => { if (lastId) processEvent(lastId); });
+  document.getElementById("delayEvent").addEventListener("click", () => {
+    beginPayment();
+    logEvent("WAIT", "Confirmation is delayed for 3 seconds. Keep pending; do not assume success or failure.", true);
+    showOutcome("AWAITING WEBHOOK", "Waiting for confirmation. A slow webhook leaves this payment pending and the recorded total unchanged.");
+    const event = sampleEvent("succeeded", 1);
+    pendingDelivery = setTimeout(() => {
+      pendingDelivery = null;
+      processEvent(event);
+      showOutcome("PAYMENT RECORDED", "The delayed webhook arrived. The pending payment is now confirmed and recorded once.");
+    }, 3000);
+    updateControls();
+  });
+  document.getElementById("outOfOrderEvent").addEventListener("click", () => {
+    beginPayment();
+    logEvent("ORDER", "Delivering success (version 2) before pending (version 1).");
+    processEvent(sampleEvent("succeeded", 2));
+    processEvent(sampleEvent("pending", 1));
+  });
+  document.getElementById("failEvent").addEventListener("click", () => {
+    beginPayment();
+    processEvent(sampleEvent("failed", 1));
+  });
+  retry.addEventListener("click", () => {
+    if (!currentPayment || currentPayment.status !== "failed") return;
+    logEvent("RETRY", "Starting a new attempt for " + currentPayment.id + ". This sample attempt succeeds.");
+    processEvent(sampleEvent("succeeded", currentPayment.version + 1));
+    showOutcome("RETRY SUCCEEDED", "The new attempt succeeded. The earlier failed attempt recorded nothing; this payment is credited once.");
+  });
+  replay.addEventListener("click", () => { if (lastEvent) processEvent(lastEvent); });
   document.getElementById("resetDemo").addEventListener("click", () => {
-    eventCount = paymentCount = duplicateCount = 0;
-    lastId = null;
+    clearTimeout(pendingDelivery);
+    pendingDelivery = null;
+    eventCount = paymentCount = duplicateCount = paymentSequence = 0;
+    lastEvent = currentPayment = null;
     processed.clear();
     startTime = Date.now();
     log.replaceChildren();
     logEvent("READY", "Waiting for a sample event…");
-    ["eventCount", "paymentCount", "duplicateCount"].forEach((id) => { document.getElementById(id).textContent = "0"; });
-    replay.disabled = true;
-    document.getElementById("consoleState").textContent = "IDLE";
+    showOutcome("IDLE", "Choose a scenario to see how the payment is handled.");
+    updateControls();
   });
 
   const contactForm = document.getElementById("contactForm");
