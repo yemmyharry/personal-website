@@ -1,396 +1,287 @@
 (() => {
   "use strict";
 
-  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  /* ---------- Theme toggle ---------- */
   const root = document.documentElement;
   const themeToggle = document.getElementById("themeToggle");
-  const THEME_KEY = "yh-theme";
-
-  function applyTheme(theme) {
-    root.setAttribute("data-theme", theme);
-    localStorage.setItem(THEME_KEY, theme);
+  function updateThemeLabel() {
+    const label = root.dataset.theme === "dark" ? "Switch to light theme" : "Switch to dark theme";
+    themeToggle.setAttribute("aria-label", label);
+    themeToggle.title = label;
   }
-
-  (function initTheme() {
-    const saved = localStorage.getItem(THEME_KEY);
-    if (saved) {
-      applyTheme(saved);
-    } else {
-      const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
-      applyTheme(prefersLight ? "light" : "dark");
-    }
-  })();
-
-  themeToggle?.addEventListener("click", () => {
-    const next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
-    applyTheme(next);
+  updateThemeLabel();
+  themeToggle.addEventListener("click", () => {
+    root.dataset.theme = root.dataset.theme === "dark" ? "light" : "dark";
+    try { localStorage.setItem("yh-theme", root.dataset.theme); } catch (_) {}
+    updateThemeLabel();
   });
+  document.getElementById("year").textContent = new Date().getFullYear();
 
-  /* ---------- Mobile nav ---------- */
   const navToggle = document.getElementById("navToggle");
   const navLinks = document.getElementById("navLinks");
-
-  navToggle?.addEventListener("click", () => {
-    const isOpen = navLinks.classList.toggle("is-open");
-    navToggle.setAttribute("aria-expanded", String(isOpen));
+  function closeNav() {
+    navLinks.classList.remove("is-open");
+    navToggle.setAttribute("aria-expanded", "false");
+    navToggle.setAttribute("aria-label", "Open navigation");
+  }
+  navToggle.addEventListener("click", () => {
+    const open = navLinks.classList.toggle("is-open");
+    navToggle.setAttribute("aria-expanded", String(open));
+    navToggle.setAttribute("aria-label", open ? "Close navigation" : "Open navigation");
   });
+  navLinks.querySelectorAll("a").forEach((link) => link.addEventListener("click", closeNav));
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && navLinks.classList.contains("is-open")) {
+      closeNav();
+      navToggle.focus();
+    }
+  });
+  document.addEventListener("click", (event) => {
+    if (!event.target.closest(".nav")) closeNav();
+  });
+  window.matchMedia("(min-width: 681px)").addEventListener("change", closeNav);
 
-  navLinks?.querySelectorAll("a").forEach((link) => {
-    link.addEventListener("click", () => {
-      navLinks.classList.remove("is-open");
-      navToggle?.setAttribute("aria-expanded", "false");
+  const systemData = {
+    payments: {
+      entry: "Checkout", core: "Go payment service", leftLabel: "STATE", left: "Database",
+      rightLabel: "SETTLEMENT", right: "Payment rails",
+      description: "A successful charge is only the beginning. Validation, state changes, and repeat events all need deliberate handling."
+    },
+    realtime: {
+      entry: "Client connection", core: "Go WebSocket service", leftLabel: "STATE", left: "Inventory locks",
+      rightLabel: "DELIVERY", right: "Live updates",
+      description: "Keep people in sync while state changes. Ticket availability, connection lifetimes, and updates belong to the same story."
+    },
+    media: {
+      entry: "Media upload", core: "Processing pipeline", leftLabel: "TRANSFORM", left: "FFmpeg",
+      rightLabel: "DELIVERY", right: "Asset storage",
+      description: "An upload is a workflow. Validate the asset, transform it into useful formats, and prepare it for delivery."
+    }
+  };
+  const tabs = Array.from(document.querySelectorAll("[data-system]"));
+  function selectSystem(tab, focus) {
+    tabs.forEach((item) => {
+      const selected = item === tab;
+      item.setAttribute("aria-selected", String(selected));
+      item.tabIndex = selected ? 0 : -1;
+    });
+    const data = systemData[tab.dataset.system];
+    const fields = { nodeEntry: "entry", nodeCore: "core", nodeLeftLabel: "leftLabel", nodeLeft: "left", nodeRightLabel: "rightLabel", nodeRight: "right", systemDescription: "description" };
+    Object.entries(fields).forEach(([id, key]) => { document.getElementById(id).textContent = data[key]; });
+    document.getElementById("system-panel").setAttribute("aria-labelledby", tab.id);
+    if (focus) tab.focus();
+  }
+  tabs.forEach((tab, index) => {
+    tab.addEventListener("click", () => selectSystem(tab, false));
+    tab.addEventListener("keydown", (event) => {
+      let next;
+      if (event.key === "ArrowRight") next = (index + 1) % tabs.length;
+      if (event.key === "ArrowLeft") next = (index - 1 + tabs.length) % tabs.length;
+      if (event.key === "Home") next = 0;
+      if (event.key === "End") next = tabs.length - 1;
+      if (next !== undefined) {
+        event.preventDefault();
+        selectSystem(tabs[next], true);
+      }
     });
   });
 
-  /* ---------- Scrollspy ---------- */
-  const sections = document.querySelectorAll("main section[id]");
-  const navLinkMap = new Map();
-  document.querySelectorAll(".nav-link").forEach((a) => {
-    navLinkMap.set(a.getAttribute("href")?.slice(1), a);
+  const cases = {
+    clooza: {
+      eyebrow: "CLOOZA / PROFESSIONAL WORK",
+      title: "Connecting the moving parts of commerce.",
+      intro: "Full-stack and backend engineering across commerce, ticketing, media, and payment workflows.",
+      sections: [
+        { title: "The problem", paragraphs: ["A commerce platform brings together systems with different rules: payment providers, subscriptions, inventory, media, and customer communication. They need to work together without losing the details that make each one reliable."] },
+        { title: "My role", paragraphs: ["I work across Go backend services and React product interfaces, connecting business requirements to implementation and maintaining the workflows behind the user experience."] },
+        { title: "Selected engineering work", list: ["Payment integrations: multi-provider checkout and webhook handling across payment rails.", "Subscriptions: billing periods, plan and pricing validation, admin discount codes, and renewal rules.", "Entitlements: messaging credits that scale with the number of subscription months.", "Shipping: currency validation for Shipbubble top-ups, restricting the workflow to Naira.", "Real-time and media: WebSocket services and FFmpeg-based asset processing."] },
+        { title: "The decisions that matter", paragraphs: ["Validate the plan and price on the backend. Apply billing-period and promotional discounts consistently. Treat a repeat payment event deliberately. Keep provider-specific constraints at the integration boundary.", "These are the details that turn a feature request into a workflow the rest of the product can depend on."] }
+      ],
+      status: "Recent subscription and shipping changes were completed as feature work. Production rollout is separate from implementation.",
+      links: [{ label: "Visit Clooza", href: "https://clooza.com" }]
+    },
+    ipile: {
+      eyebrow: "IPILẸ WALLET / FOUNDER & LEAD ENGINEER",
+      title: "Making Bitcoin fit into everyday life.",
+      intro: "A founder project bringing Bitcoin and Lightning payments to familiar web and conversational experiences.",
+      sections: [
+        { title: "The problem", paragraphs: ["A payment tool has to make sense to the person using it. Ipilẹ explores how Bitcoin payments can fit into familiar interactions while the backend handles the underlying payment workflows."] },
+        { title: "My role", paragraphs: ["Founder and lead engineer, working from product direction through Go backend services, PostgreSQL ledger workflows, React interfaces, and Lightning integrations."] },
+        { title: "Engineering focus", list: ["Connect web and chat experiences around coherent payment flows.", "Handle Lightning invoices, Lightning Addresses, and LNURL interactions.", "Model ledger state and payment lifecycle changes deliberately.", "Build commerce-oriented workflows and localised interfaces."] },
+        { title: "What makes it challenging", paragraphs: ["Different interfaces still need to represent the same payment state. A conversational request, a pending invoice, and a completed transfer have to communicate clearly to users while remaining consistent in the backend.", "The work combines product design, systems thinking, and payment integration rather than stopping at one layer of the application."] }
+      ],
+      status: "Custody models and resilient transport are areas of ongoing exploration. They are not claims of a completed non-custodial release or an independent security audit.",
+      links: [{ label: "Visit Ipilẹ", href: "https://ipile.xyz" }]
+    },
+    monitor: {
+      eyebrow: "BITCOIN NETWORK MONITOR / OPEN-SOURCE BACKEND WORK",
+      title: "Turning node responses into useful insight.",
+      intro: "Go backend contributions to a Bitcoin monitoring tool, with public work dating to 2024.",
+      sections: [
+        { title: "The problem", paragraphs: ["Low-level node data is only useful when an API returns the right information and interprets it correctly. A monitoring service needs more than a thin wrapper around RPC calls."] },
+        { title: "My contributions", list: ["Node RPC integration and block and transaction endpoints.", "Address lookups and network statistics.", "Corrections to network hashrate calculations.", "Fixes to the retrieval of recent transactions."] },
+        { title: "What the work taught me", paragraphs: ["Accuracy at the API boundary depends on understanding the Bitcoin structures underneath it. Working on transaction retrieval and hashrate calculations meant tracing the source data and checking what each response actually represented."] }
+      ],
+      links: [{ label: "Explore the repository", href: "https://github.com/yemmyharry/btc-network-monitor" }, { label: "Transaction retrieval PR", href: "https://github.com/yemmyharry/btc-network-monitor/pull/11" }]
+    },
+    kurier: {
+      eyebrow: "KURIER / IN DEVELOPMENT",
+      title: "When connectivity cannot be taken for granted.",
+      intro: "An independent open-source transport SDK exploring resilient delivery of Bitcoin transactions and payment messages.",
+      sections: [
+        { title: "The direction", paragraphs: ["Compress and route payment-related payloads across constrained connections. The design explores how smaller, transportable messages could serve as a fallback when normal internet connectivity is unavailable."] },
+        { title: "Areas under exploration", list: ["Payload encoding, compression, and message chunking.", "Transport adapters for low-bandwidth channels such as SMS and mesh networks.", "Delivery, reassembly, and integrity checks.", "A separate SDK that applications such as Ipilẹ could integrate."] },
+        { title: "Why separate it from the wallet?", paragraphs: ["Transport resilience is a reusable problem. Keeping it independent makes the boundary clearer: applications own their payment experience, while a transport layer focuses on moving payloads across available channels."] }
+      ],
+      status: "Development direction, not a released guarantee. Channel support, offline behaviour, and integrations need to be implemented and validated before being presented as available."
+    }
+  };
+  const dialog = document.getElementById("caseDialog");
+  let dialogTrigger = null;
+  function createElement(tag, text, className) {
+    const element = document.createElement(tag);
+    if (text !== undefined) element.textContent = text;
+    if (className) element.className = className;
+    return element;
+  }
+  function openCase(key, trigger) {
+    const study = cases[key];
+    if (!study) return;
+    dialogTrigger = trigger;
+    document.getElementById("caseEyebrow").textContent = study.eyebrow;
+    document.getElementById("caseTitle").textContent = study.title;
+    document.getElementById("caseIntro").textContent = study.intro;
+    const content = document.getElementById("caseContent");
+    content.replaceChildren();
+    study.sections.forEach((section) => {
+      const block = createElement("section", undefined, "case-section");
+      block.append(createElement("h3", section.title));
+      (section.paragraphs || []).forEach((text) => block.append(createElement("p", text)));
+      if (section.list) {
+        const list = createElement("ul");
+        section.list.forEach((text) => list.append(createElement("li", text)));
+        block.append(list);
+      }
+      content.append(block);
+    });
+    if (study.status) content.append(createElement("p", study.status, "case-status"));
+    const links = document.getElementById("caseLinks");
+    links.replaceChildren();
+    (study.links || []).forEach((link) => {
+      const anchor = createElement("a", link.label + " ↗", "text-link");
+      anchor.href = link.href;
+      anchor.target = "_blank";
+      anchor.rel = "noopener";
+      links.append(anchor);
+    });
+    root.classList.add("has-dialog");
+    document.body.classList.add("dialog-open");
+    dialog.showModal();
+    dialog.scrollTop = 0;
+    document.getElementById("closeCase").focus({ preventScroll: true });
+  }
+  document.querySelectorAll("[data-case]").forEach((button) => button.addEventListener("click", () => openCase(button.dataset.case, button)));
+  document.getElementById("closeCase").addEventListener("click", () => dialog.close());
+  dialog.addEventListener("click", (event) => {
+    if (event.target === dialog) {
+      const bounds = dialog.getBoundingClientRect();
+      if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) dialog.close();
+    }
+  });
+  dialog.addEventListener("close", () => {
+    root.classList.remove("has-dialog");
+    document.body.classList.remove("dialog-open");
+    if (dialogTrigger) dialogTrigger.focus({ preventScroll: true });
+  });
+  document.getElementById("caseContact").addEventListener("click", () => {
+    dialog.close();
+    document.getElementById("contact").scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+    document.getElementById("contactName").focus({ preventScroll: true });
   });
 
-  if ("IntersectionObserver" in window) {
-    const spy = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          const link = navLinkMap.get(entry.target.id);
-          if (!link) return;
-          if (entry.isIntersecting) {
-            document.querySelectorAll(".nav-link.is-active").forEach((l) => l.classList.remove("is-active"));
-            link.classList.add("is-active");
-          }
-        });
-      },
-      { rootMargin: "-45% 0px -50% 0px", threshold: 0 }
-    );
-    sections.forEach((s) => spy.observe(s));
+  const log = document.getElementById("eventLog");
+  let eventCount = 0;
+  let paymentCount = 0;
+  let duplicateCount = 0;
+  let lastId = null;
+  let startTime = Date.now();
+  const processed = new Set();
+  const replay = document.getElementById("replayEvent");
+  function logEvent(level, text, duplicate) {
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    const time = String(Math.floor(elapsed / 60)).padStart(2, "0") + ":" + String(elapsed % 60).padStart(2, "0");
+    const line = createElement("div", undefined, "log-line");
+    line.append(createElement("span", time, "log-time"), createElement("span", level, "log-info" + (duplicate ? " duplicate" : "")), createElement("span", text));
+    log.append(line);
+    while (log.children.length > 35) log.firstElementChild.remove();
+    log.scrollTop = log.scrollHeight;
   }
-
-  /* ---------- Reveal on scroll ---------- */
-  const revealEls = document.querySelectorAll(".reveal");
-  if (prefersReducedMotion || !("IntersectionObserver" in window)) {
-    revealEls.forEach((el) => el.classList.add("is-visible"));
-  } else {
-    const revealer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("is-visible");
-            revealer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.12 }
-    );
-    revealEls.forEach((el) => revealer.observe(el));
-  }
-
-  /* ---------- Hero typing effect ---------- */
-  const typingEl = document.getElementById("typingText");
-  const roles = [
-    "Founder, Ipilẹ Wallet",
-    "Software Engineer, 7+ yrs",
-    "Protocol Engineer",
-    "Btrust Builder",
-    "Bitcoin protocol contributor",
-    "Full-stack & Go systems engineer",
-  ];
-
-  if (typingEl) {
-    if (prefersReducedMotion) {
-      typingEl.textContent = roles[0];
+  function processEvent(id) {
+    eventCount++;
+    logEvent("RECEIVE", id + " · payment.succeeded");
+    if (processed.has(id)) {
+      duplicateCount++;
+      logEvent("SKIP", "Event ID already processed. No second payment.", true);
+      document.getElementById("consoleState").textContent = "DUPLICATE SKIPPED";
     } else {
-      let roleIndex = 0, charIndex = 0, deleting = false;
-      const TYPE_SPEED = 55, DELETE_SPEED = 30, HOLD = 1400;
-
-      function tick() {
-        const word = roles[roleIndex];
-        if (!deleting) {
-          charIndex++;
-          typingEl.textContent = word.slice(0, charIndex);
-          if (charIndex === word.length) {
-            deleting = true;
-            return setTimeout(tick, HOLD);
-          }
-        } else {
-          charIndex--;
-          typingEl.textContent = word.slice(0, charIndex);
-          if (charIndex === 0) {
-            deleting = false;
-            roleIndex = (roleIndex + 1) % roles.length;
-          }
-        }
-        setTimeout(tick, deleting ? DELETE_SPEED : TYPE_SPEED);
-      }
-      tick();
+      processed.add(id);
+      paymentCount++;
+      logEvent("COMMIT", "Event marked processed; one payment recorded.");
+      document.getElementById("consoleState").textContent = "PAYMENT RECORDED";
     }
+    document.getElementById("eventCount").textContent = eventCount;
+    document.getElementById("paymentCount").textContent = paymentCount;
+    document.getElementById("duplicateCount").textContent = duplicateCount;
   }
-
-  /* ---------- BTC price / block height ticker ---------- */
-  const btcPriceEl = document.getElementById("btcPrice");
-  const btcHeightEl = document.getElementById("btcHeight");
-
-  function fetchWithTimeout(url, ms = 6000) {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), ms);
-    return fetch(url, { signal: controller.signal }).finally(() => clearTimeout(timer));
-  }
-
-  async function updateBtcStats() {
-    try {
-      const priceRes = await fetchWithTimeout("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd");
-      if (priceRes.ok) {
-        const data = await priceRes.json();
-        const price = data?.bitcoin?.usd;
-        if (btcPriceEl) {
-          btcPriceEl.textContent = Number.isFinite(price) ? "$" + price.toLocaleString("en-US") : "unavailable";
-        }
-      } else if (btcPriceEl) {
-        btcPriceEl.textContent = "unavailable";
-      }
-    } catch (_) {
-      if (btcPriceEl) btcPriceEl.textContent = "unavailable";
-    }
-
-    try {
-      const heightRes = await fetchWithTimeout("https://mempool.space/api/blocks/tip/height");
-      if (heightRes.ok) {
-        const height = Number((await heightRes.text()).trim());
-        if (btcHeightEl) btcHeightEl.textContent = Number.isFinite(height) ? height.toLocaleString("en-US") : "unavailable";
-      } else if (btcHeightEl) {
-        btcHeightEl.textContent = "unavailable";
-      }
-    } catch (_) {
-      if (btcHeightEl) btcHeightEl.textContent = "unavailable";
-    }
-  }
-
-  updateBtcStats();
-  setInterval(updateBtcStats, 60000);
-
-  /* ---------- Project filter ---------- */
-  const filterButtons = document.querySelectorAll(".filter-btn");
-  const projectCards = document.querySelectorAll(".project-card");
-
-  filterButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      filterButtons.forEach((b) => b.classList.remove("is-active"));
-      btn.classList.add("is-active");
-      const filter = btn.dataset.filter;
-      projectCards.forEach((card) => {
-        const tags = card.dataset.tags?.split(" ") ?? [];
-        const show = filter === "all" || tags.includes(filter);
-        card.hidden = !show;
-      });
-    });
+  document.getElementById("sendEvent").addEventListener("click", () => {
+    lastId = "evt_demo_" + String(paymentCount + 1).padStart(3, "0");
+    processEvent(lastId);
+    replay.disabled = false;
+  });
+  replay.addEventListener("click", () => { if (lastId) processEvent(lastId); });
+  document.getElementById("resetDemo").addEventListener("click", () => {
+    eventCount = paymentCount = duplicateCount = 0;
+    lastId = null;
+    processed.clear();
+    startTime = Date.now();
+    log.replaceChildren();
+    logEvent("READY", "Waiting for a sample event…");
+    ["eventCount", "paymentCount", "duplicateCount"].forEach((id) => { document.getElementById(id).textContent = "0"; });
+    replay.disabled = true;
+    document.getElementById("consoleState").textContent = "IDLE";
   });
 
-  /* ---------- SHA-256 playground ---------- */
-  const hashInput = document.getElementById("hashInput");
-  const hashOutput = document.getElementById("hashOutput");
-  const hashDiff = document.getElementById("hashDiff");
-  let previousHashBits = null;
-
-  function hexToBits(hex) {
-    return hex.split("").map((c) => parseInt(c, 16).toString(2).padStart(4, "0")).join("");
-  }
-
-  function bitDiffPercent(a, b) {
-    if (!a || !b || a.length !== b.length) return null;
-    let diff = 0;
-    for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) diff++;
-    return Math.round((diff / a.length) * 100);
-  }
-
-  async function computeHash(text) {
-    const enc = new TextEncoder().encode(text);
-    const digest = await crypto.subtle.digest("SHA-256", enc);
-    return Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, "0")).join("");
-  }
-
-  let hashDebounce;
-  async function updateHash() {
-    if (!hashInput || !hashOutput) return;
-    const value = hashInput.value;
-    if (!value) {
-      hashOutput.textContent = "—";
-      hashDiff.textContent = "—";
-      previousHashBits = null;
-      return;
-    }
-    const hex = await computeHash(value);
-    hashOutput.textContent = hex;
-    const bits = hexToBits(hex);
-    const pct = bitDiffPercent(previousHashBits, bits);
-    hashDiff.textContent = pct === null ? "—" : pct + "%";
-    previousHashBits = bits;
-  }
-
-  hashInput?.addEventListener("input", () => {
-    clearTimeout(hashDebounce);
-    hashDebounce = setTimeout(updateHash, 120);
-  });
-  updateHash();
-
-  /* ---------- Contact form submit & reset ---------- */
   const contactForm = document.getElementById("contactForm");
   const contactStatus = document.getElementById("contactStatus");
-  const contactSubmitBtn = contactForm?.querySelector('button[type="submit"]');
-
-  contactForm?.addEventListener("submit", async (event) => {
+  const isLocalPreview = ["localhost", "127.0.0.1", "::1", "[::1]"].includes(location.hostname) || location.protocol === "file:";
+  if (isLocalPreview) contactForm.querySelector(".form-note").textContent = "Local preview: you can test this form. Messages will not be sent.";
+  contactForm.addEventListener("submit", async (event) => {
     event.preventDefault();
-    if (!contactSubmitBtn) return;
-
-    const originalBtnText = contactSubmitBtn.textContent;
-    contactSubmitBtn.disabled = true;
-    contactSubmitBtn.textContent = "Sending…";
-
-    if (contactStatus) {
-      contactStatus.className = "form-status";
-      contactStatus.textContent = "";
-      contactStatus.hidden = true;
+    if (!contactForm.reportValidity()) return;
+    contactStatus.hidden = false;
+    contactStatus.className = "form-status";
+    if (isLocalPreview) {
+      contactStatus.textContent = "Preview complete. Your message has not been sent.";
+      return;
     }
-
+    const button = contactForm.querySelector("button[type=submit]");
+    const originalText = button.textContent;
+    button.disabled = true;
+    button.textContent = "Sending…";
+    contactStatus.textContent = "";
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
     try {
-      const response = await fetch(contactForm.action, {
-        method: contactForm.method || "POST",
-        body: new FormData(contactForm),
-        headers: {
-          Accept: "application/json",
-        },
-      });
-
-      if (response.ok) {
-        contactForm.reset();
-        if (contactStatus) {
-          contactStatus.textContent = "Thanks! Your message has been sent successfully.";
-          contactStatus.className = "form-status is-success";
-          contactStatus.hidden = false;
-        }
-      } else {
-        const data = await response.json().catch(() => null);
-        let errorMsg = "Oops! There was a problem sending your message. Please try again.";
-        if (data && Array.isArray(data.errors) && data.errors.length > 0) {
-          errorMsg = data.errors.map((err) => err.message).join(", ");
-        }
-        if (contactStatus) {
-          contactStatus.textContent = errorMsg;
-          contactStatus.className = "form-status is-error";
-          contactStatus.hidden = false;
-        }
-      }
+      const response = await fetch(contactForm.action, { method: "POST", body: new FormData(contactForm), headers: { Accept: "application/json" }, signal: controller.signal });
+      if (!response.ok) throw new Error("Unable to send");
+      contactForm.reset();
+      contactStatus.textContent = "Thanks for reaching out. Your message has been sent.";
     } catch (_) {
-      if (contactStatus) {
-        contactStatus.textContent = "Network error. Please check your connection and try again.";
-        contactStatus.className = "form-status is-error";
-        contactStatus.hidden = false;
-      }
+      contactStatus.classList.add("is-error");
+      contactStatus.textContent = "Your message could not be sent. Please try again or contact me on LinkedIn.";
     } finally {
-      contactSubmitBtn.disabled = false;
-      contactSubmitBtn.textContent = originalBtnText;
+      clearTimeout(timeout);
+      button.disabled = false;
+      button.textContent = originalText;
     }
   });
-
-  contactForm?.addEventListener("input", () => {
-    if (contactStatus && contactStatus.classList.contains("is-success")) {
-      contactStatus.className = "form-status";
-      contactStatus.textContent = "";
-      contactStatus.hidden = true;
-    }
-  });
-
-  window.addEventListener("pageshow", (event) => {
-    if (event.persisted) {
-      contactForm?.reset();
-    }
-  });
-
-  /* ---------- Back to top ---------- */
-  const backToTop = document.getElementById("backToTop");
-  window.addEventListener("scroll", () => {
-    if (!backToTop) return;
-    backToTop.style.opacity = window.scrollY > 600 ? "1" : "0.35";
-  }, { passive: true });
-  backToTop?.addEventListener("click", () => {
-    window.scrollTo({ top: 0, behavior: prefersReducedMotion ? "auto" : "smooth" });
-  });
-
-  /* ---------- Footer year ---------- */
-  const yearEl = document.getElementById("year");
-  if (yearEl) yearEl.textContent = String(new Date().getFullYear());
-
-  /* ---------- Background network canvas ---------- */
-  const canvas = document.getElementById("bg-canvas");
-  if (canvas && !prefersReducedMotion) {
-    const ctx = canvas.getContext("2d");
-    let width, height, nodes;
-    const NODE_COUNT = 46;
-    const LINK_DIST = 130;
-    let running = true;
-
-    function resize() {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
-    }
-
-    function makeNodes() {
-      nodes = Array.from({ length: NODE_COUNT }, () => ({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.25,
-        vy: (Math.random() - 0.5) * 0.25,
-      }));
-    }
-
-    function accentColor() {
-      const isLight = root.getAttribute("data-theme") === "light";
-      return isLight ? "217, 122, 6" : "247, 147, 26";
-    }
-
-    function step() {
-      if (!running) return;
-      ctx.clearRect(0, 0, width, height);
-      const color = accentColor();
-
-      nodes.forEach((n) => {
-        n.x += n.vx; n.y += n.vy;
-        if (n.x < 0 || n.x > width) n.vx *= -1;
-        if (n.y < 0 || n.y > height) n.vy *= -1;
-      });
-
-      for (let i = 0; i < nodes.length; i++) {
-        for (let j = i + 1; j < nodes.length; j++) {
-          const a = nodes[i], b = nodes[j];
-          const dist = Math.hypot(a.x - b.x, a.y - b.y);
-          if (dist < LINK_DIST) {
-            ctx.strokeStyle = `rgba(${color}, ${0.15 * (1 - dist / LINK_DIST)})`;
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(a.x, a.y);
-            ctx.lineTo(b.x, b.y);
-            ctx.stroke();
-          }
-        }
-      }
-      nodes.forEach((n) => {
-        ctx.fillStyle = `rgba(${color}, 0.55)`;
-        ctx.beginPath();
-        ctx.arc(n.x, n.y, 1.6, 0, Math.PI * 2);
-        ctx.fill();
-      });
-
-      requestAnimationFrame(step);
-    }
-
-    resize();
-    makeNodes();
-    requestAnimationFrame(step);
-    window.addEventListener("resize", () => { resize(); makeNodes(); });
-    document.addEventListener("visibilitychange", () => {
-      running = !document.hidden;
-      if (running) requestAnimationFrame(step);
-    });
-  }
 })();
