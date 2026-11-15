@@ -28,7 +28,7 @@
     navToggle.setAttribute("aria-expanded", String(open));
     navToggle.setAttribute("aria-label", open ? "Close navigation" : "Open navigation");
   });
-  navLinks.querySelectorAll("a").forEach((link) => link.addEventListener("click", closeNav));
+  document.querySelectorAll('.nav a[href^="#"]').forEach((link) => link.addEventListener("click", closeNav));
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && navLinks.classList.contains("is-open")) {
       closeNav();
@@ -38,7 +38,7 @@
   document.addEventListener("click", (event) => {
     if (!event.target.closest(".nav")) closeNav();
   });
-  window.matchMedia("(min-width: 681px)").addEventListener("change", closeNav);
+  window.matchMedia("(min-width: 851px)").addEventListener("change", closeNav);
 
   const systemData = {
     payments: {
@@ -143,6 +143,20 @@
     if (className) element.className = className;
     return element;
   }
+  function createIcon(name) {
+    const namespace = "http://www.w3.org/2000/svg";
+    const icon = document.createElementNS(namespace, "svg");
+    icon.setAttribute("class", "icon");
+    icon.setAttribute("viewBox", "0 0 24 24");
+    icon.setAttribute("width", "16");
+    icon.setAttribute("height", "16");
+    icon.setAttribute("aria-hidden", "true");
+    icon.setAttribute("focusable", "false");
+    const reference = document.createElementNS(namespace, "use");
+    reference.setAttribute("href", "#icon-" + name);
+    icon.append(reference);
+    return icon;
+  }
   function openCase(key, trigger) {
     const study = cases[key];
     if (!study) return;
@@ -167,7 +181,8 @@
     const links = document.getElementById("caseLinks");
     links.replaceChildren();
     (study.links || []).forEach((link) => {
-      const anchor = createElement("a", link.label + " ↗", "text-link");
+      const anchor = createElement("a", link.label, "text-link");
+      anchor.append(createIcon("arrow-up-right"));
       anchor.href = link.href;
       anchor.target = "_blank";
       anchor.rel = "noopener";
@@ -264,7 +279,7 @@
       return;
     }
     const button = contactForm.querySelector("button[type=submit]");
-    const originalText = button.textContent;
+    const originalContent = Array.from(button.childNodes);
     button.disabled = true;
     button.textContent = "Sending…";
     contactStatus.textContent = "";
@@ -281,7 +296,7 @@
     } finally {
       clearTimeout(timeout);
       button.disabled = false;
-      button.textContent = originalText;
+      button.replaceChildren(...originalContent);
     }
   });
 })();
