@@ -42,17 +42,22 @@
 
   const systemData = {
     payments: {
-      entry: "Checkout", core: "Go payment service", leftLabel: "STATE", left: "Database",
+      language: "GO", entry: "Checkout", core: "Go payment service", leftLabel: "STATE", left: "Database",
       rightLabel: "SETTLEMENT", right: "Payment rails",
       description: "A successful charge is only the beginning. Validation, state changes, and repeat events all need deliberate handling."
     },
     realtime: {
-      entry: "Client connection", core: "Go WebSocket service", leftLabel: "STATE", left: "Inventory locks",
+      language: "GO", entry: "Client connection", core: "Go WebSocket service", leftLabel: "STATE", left: "Inventory locks",
       rightLabel: "DELIVERY", right: "Live updates",
       description: "Keep people in sync while state changes. Ticket availability, connection lifetimes, and updates belong to the same story."
     },
+    agents: {
+      language: "AI", entry: "Scoped engineering task", core: "Agent + tool loop", leftLabel: "CONTEXT", left: "Code & constraints",
+      rightLabel: "VERIFY", right: "Tests & review",
+      description: "Define the task, give the agent context, and inspect the result. Tool use and iteration lead to a reviewed change; the engineer owns the final decision."
+    },
     media: {
-      entry: "Media upload", core: "Processing pipeline", leftLabel: "TRANSFORM", left: "FFmpeg",
+      language: "MEDIA", entry: "Media upload", core: "Processing pipeline", leftLabel: "TRANSFORM", left: "FFmpeg",
       rightLabel: "DELIVERY", right: "Asset storage",
       description: "An upload is a workflow. Validate the asset, transform it into useful formats, and prepare it for delivery."
     }
@@ -65,9 +70,12 @@
       item.tabIndex = selected ? 0 : -1;
     });
     const data = systemData[tab.dataset.system];
-    const fields = { nodeEntry: "entry", nodeCore: "core", nodeLeftLabel: "leftLabel", nodeLeft: "left", nodeRightLabel: "rightLabel", nodeRight: "right", systemDescription: "description" };
+    const fields = { nodeLanguage: "language", nodeEntry: "entry", nodeCore: "core", nodeLeftLabel: "leftLabel", nodeLeft: "left", nodeRightLabel: "rightLabel", nodeRight: "right", systemDescription: "description" };
     Object.entries(fields).forEach(([id, key]) => { document.getElementById(id).textContent = data[key]; });
     document.getElementById("system-panel").setAttribute("aria-labelledby", tab.id);
+    const agents = tab.dataset.system === "agents";
+    document.getElementById("systemFooter").setAttribute("href", agents ? "#approach" : "#lab");
+    document.getElementById("systemFooterLabel").textContent = agents ? "Explore my engineering approach" : "Try the payment event demo";
     if (focus) tab.focus();
   }
   tabs.forEach((tab, index) => {
