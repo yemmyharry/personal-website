@@ -317,4 +317,18 @@ h1{font-size:clamp(65px,6.7vw,96px);line-height:.99;letter-spacing:-.07em;font-w
 @media(max-width:360px){.log-line{font-size:7px;grid-template-columns:28px 43px 1fr}.console-summary .tiny-label{font-size:5px}}
 @media(max-width:360px){.hero h1{font-size:60px}.hero-actions{gap:17px}.hero-actions>.button{padding-inline:15px;gap:20px;font-size:11px}.nav{gap:10px}.nav-actions{gap:4px}.nav-toggle{padding-inline:6px}}
 @media(max-width:850px) and (min-width:681px){.project-copy>p{font-size:12px}.project-points{font-size:10px}.section-intro{font-size:11px}.about-main>p:not(.eyebrow){font-size:12px}}
+/* Let phone controls wrap without squeezing their labels or tap targets. */
+@media(max-width:680px){
+  .nav{gap:12px}
+  .nav-actions{gap:6px}
+  .theme-toggle,.nav-toggle{min-width:44px;min-height:44px}
+  .nav-contact{display:inline-flex;align-items:center;min-height:44px}
+  .hero-actions{flex-wrap:wrap;gap:12px 24px}
+  .hero-actions>a{min-height:44px;white-space:nowrap}
+  .system-tabs button{min-height:44px}
+}
+@media(max-width:360px){
+  .nav{gap:4px}
+  .nav-actions{gap:0}
+}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation:none!important;transition:none!important}.button:hover:not(:disabled){transform:none}}
