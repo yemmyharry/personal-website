@@ -17,10 +17,19 @@ export const projects = {
 };
 export const contributions = [
  ['BTCPay Server','Fix QR / URL mismatch','#7058','https://github.com/btcpayserver/btcpayserver/pull/7058'],
+ ['BTCPay plugin builder','Display social icons','#118','https://github.com/btcpayserver/btcpayserver-plugin-builder/pull/118'],
+ ['RockstarDev BTCPay plugins','Allow a custom keypath','#81','https://github.com/rockstardev/BTCPayServerPlugins.RockstarDev/pull/81'],
  ['Polar','Use channelPoint as a unique identifier','#1362','https://github.com/jamaljsr/polar/pull/1362'],
  ['ZEUS documentation','Document outpoints','#27','https://github.com/ZeusLN/zeus-docs/pull/27'],
  ['Fedimint clientd','Go test contribution','#21','https://github.com/fedimint/fedimint-clientd/pull/21']
 ];
+// Explicit repository scope keeps personal-site and unrelated PRs out of this history.
+export const bitcoinContributionHistory='https://github.com/search?type=pullrequests&q='+encodeURIComponent('is:pr author:yemmyharry '+[
+ 'btcpayserver/btcpayserver','btcpayserver/btcpayserver-plugin-builder',
+ 'rockstardev/BTCPayServerPlugins.RockstarDev','jamaljsr/polar','ZeusLN/zeus-docs',
+ 'fedimint/fedimint-clientd','btcsuite/btcd','getfloresta/Floresta',
+ 'wizardsardine/liana','lightningdevkit/ldk-node'
+].map(repo=>'repo:'+repo).join(' '));
 export const articles = [
  {title:'Multisignature Wallets 101',category:'Bitcoin · Security',date:'Mar 1, 2024',datetime:'2024-03-01',url:'https://blog.devgenius.io/multisignature-wallets-101-146172d28425',summary:'How shared signing changes control over Bitcoin. An introduction to multisig, with a 2-of-3 redeem-script example in Go.',featured:true},
  {title:'BIP 32, 39, and 44',category:'Wallet internals',date:'Apr 23, 2024',datetime:'2024-04-23',url:'https://yemmyharry.medium.com/bip-32-39-and-44-hierarchical-deterministic-wallets-and-mnemonic-phrases-e6938ed1a4de',summary:'Connecting mnemonic phrases, hierarchical key derivation, and the structure of a Bitcoin wallet.'},
