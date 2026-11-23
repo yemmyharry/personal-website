@@ -152,3 +152,12 @@ Production serves the configured Umami ID and inserts its tracker. A synthetic d
 event received HTTP 200 with session/visit IDs from the Umami gateway. The signed-out
 dashboard prevents verification of private reports. Added local status explanations for
 privacy exclusions and script-loading issues without weakening privacy preferences.
+
+## Broader Bitcoin contribution history
+
+Restored two omitted merged Bitcoin contributions after checking GitHub's public merged
+PR search: btcpayserver/btcpayserver-plugin-builder #118 and
+rockstardev/BTCPayServerPlugins.RockstarDev #81. Added Bitcoin-only PR history using an
+explicit repository filter, plus all external public PR history. The history includes
+all PR statuses; selected rows remain verified merged PRs. The older site’s OSS section
+had a generic More on GitHub link. A separate remembered tracker remains unidentified.
