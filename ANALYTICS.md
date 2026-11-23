@@ -79,3 +79,17 @@ heatmap recorder, distinct user IDs, or form analytics are enabled.
 The owner dashboard lives in Umami behind its normal sign-in. Do not embed an admin token
 in a public static portfolio, and do not create a public `/admin` page with private stats.
 A private Umami dashboard already provides the requested reporting without a custom backend.
+
+## Troubleshoot missing visits
+
+Open the production `/privacy/` page in the same browser used for your visit. The status
+under the analytics control reports site opt-out, Do Not Track, Global Privacy Control,
+Umami opt-out, excluded preview hostnames, and script-loading failures. A loaded script
+is not proof of delivery: an extension can allow the script but block collection. No
+privacy preference is automatically bypassed.
+
+In Umami, select the website with ID `074837d2-2dc6-4de9-86c7-d6b1e66da857`, open
+Realtime, and remove filters. Check Today and the reporting timezone as well. A controlled
+synthetic `analytics_diagnostic` event was accepted by the cloud gateway on 23 November
+2026 to verify this website ID; exclude that event from analysis. This confirms collector
+acceptance, not that a particular browser visit appeared in the private dashboard.
