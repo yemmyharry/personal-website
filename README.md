@@ -85,3 +85,17 @@ when JavaScript or IntersectionObserver is unavailable.
 
 Personal location is omitted from the public pages, focused résumé views, downloadable
 résumé, structured metadata, and social preview artwork.
+
+The home and specialty pages also include a role-specific toolkit with project evidence
+links, plus a small selection of relevant completed courses. These are shared data in
+`content/portfolio.mjs`, and focused résumé pages include the corresponding technical
+skills. Course entries link to their credential pages and remain secondary to work.
+
+## Employer discovery and contact
+
+Home and specialty pages have descriptive engineering titles, canonical URLs, social
+previews, and Person metadata with relevant skills and a public contact email. Static
+role links and the sitemap keep focused application pages discoverable. Each view offers
+a résumé, a direct email link, LinkedIn, and the contact form. The user confirmed that
+contact delivery works on 23 November 2026. Both Qala courses appear on the main and
+Bitcoin views under Courses & credentials.
