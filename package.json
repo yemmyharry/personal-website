@@ -1,0 +1,10 @@
+{
+  "name": "yemmyharry-portfolio",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "node scripts/check.mjs",
+    "dev": "python3 -m http.server 8000"
+  }
+}
