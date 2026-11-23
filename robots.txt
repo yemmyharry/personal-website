@@ -1,4 +1,3 @@
 User-agent: *
 Allow: /
-
 Sitemap: https://yemmyharry.is-a.dev/sitemap.xml
