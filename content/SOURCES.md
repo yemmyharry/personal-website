@@ -138,3 +138,17 @@ Both previously sourced Qala courses now appear on main and Bitcoin views. Direc
 links use the public email already present in the supplied résumé. Search titles and
 Person metadata describe existing work and skills; no location or new qualifications
 were added.
+
+## Public GitHub refresh and analytics diagnostics — 23 November 2026
+
+Reviewed both pages of owned repositories, the profile README, and recent pull requests
+through the public GitHub API. Recent Rust submissions include Floresta #1484 and Liana
+#2404, both open at review time; LDK Node #1236 was closed without merging. These are
+not relabeled as merged contributions or promoted as user-authored standalone products.
+The current selected major projects remain stronger than adding more small exercises.
+Removed direct browser test-file links from the toolkit and Clinic case studies.
+
+Production serves the configured Umami ID and inserts its tracker. A synthetic diagnostic
+event received HTTP 200 with session/visit IDs from the Umami gateway. The signed-out
+dashboard prevents verification of private reports. Added local status explanations for
+privacy exclusions and script-loading issues without weakening privacy preferences.
