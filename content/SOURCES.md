@@ -114,3 +114,27 @@ workbench palettes, pointer-responsive perspective, a remixable abstract identit
 scroll reveals, reading progress, and a motion pause control. These do not claim global
 work authorization or relocate the user. No visa, availability, or immigration claims
 were added.
+
+## Role-specific toolkit and selected learning
+
+Expanded the toolkit from the supplied résumé, explicit user confirmation, professional
+case studies, and inspected public repositories. Neo4j and MongoDB at Clooza are supported
+by the résumé; Redis-cached rates and PostgreSQL ledger work at Ipilẹ are also described
+there. MySQL is supported by the Network Monitor repository. Technologies are grouped by
+role with evidence links; no numerical proficiency scores or blanket expertise claim is
+made. Rust remains qualified as learning/mentoring practice.
+
+Selected learning entries use titles, issuers, dates, and public credential URLs captured
+from the earlier public LinkedIn profile in this conversation: Qala protocol development,
+Qala Mastering Bitcoin, Educative’s The Way to Go, TUNGA testing, and Tunga algorithms.
+A fresh retrieval hit LinkedIn's sign-in wall. Newly added private-profile entries have
+not been read, inferred, or presented as verified. Courses are labeled as training and
+kept below professional experience, rather than treated as professional certification.
+
+## Employer contact and course visibility
+
+The user confirmed contact delivery on 23 November 2026 and authorized skipping Apex.
+Both previously sourced Qala courses now appear on main and Bitcoin views. Direct email
+links use the public email already present in the supplied résumé. Search titles and
+Person metadata describe existing work and skills; no location or new qualifications
+were added.
