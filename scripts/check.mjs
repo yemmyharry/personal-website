@@ -41,3 +41,34 @@ diagnosis.sandbox.navigator.doNotTrack='1';assert.match(diagnosis.sandbox.window
 delete diagnosis.sandbox.navigator.doNotTrack;
 diagnosis.storage.set('umami.disabled','1');assert.match(diagnosis.sandbox.window.portfolioAnalytics.status(),/Umami opt-out/);
 diagnosis.storage.delete('umami.disabled');diagnosis.sandbox.location.hostname='localhost';assert.match(diagnosis.sandbox.window.portfolioAnalytics.status(),/preview/);
+
+
+// Calendar boundaries, suspended tabs, and manual palette changes.
+const appearanceRoot={dataset:{theme:'light',motion:'off'}};
+let appearanceNow=new Date(2026,10,24,23,59,59),scheduledAppearance;
+const appearanceEvents={};
+const appearanceLabel={setAttribute:(key,value)=>{appearanceLabel[key]=value;}};
+class AppearanceDate extends Date{constructor(...args){super(...(args.length?args:[appearanceNow.getTime()]));}}
+const appearanceContext={Date:AppearanceDate,window:{addEventListener:(name,fn)=>{appearanceEvents[name]=fn;}},document:{documentElement:appearanceRoot,hidden:false,getElementById:()=>appearanceLabel,addEventListener:(name,fn)=>{appearanceEvents[name]=fn;}},setTimeout:(fn,delay)=>{scheduledAppearance={fn,delay};return 1;},clearTimeout:()=>{}};
+vm.runInNewContext(await readFile(resolve(root,'daily-look.js'),'utf8'),appearanceContext);
+const appearance=appearanceContext.window.PortfolioAppearance;
+const firstLook=JSON.stringify(appearanceRoot.dataset);
+appearance.refresh();assert.equal(JSON.stringify(appearanceRoot.dataset),firstLook,'Same date keeps the same appearance');
+assert.ok(scheduledAppearance.delay>0&&scheduledAppearance.delay<2000,'Refresh scheduled at the next local midnight');
+appearance.cyclePalette();const manualPalette=appearanceRoot.dataset.palette;
+appearanceEvents.visibilitychange();assert.equal(appearanceRoot.dataset.palette,manualPalette,'Returning on the same day preserves manual choice');
+appearanceNow=new Date(2026,10,25,0,0,1);scheduledAppearance.fn();
+assert.equal(appearanceRoot.dataset.appearanceDate,'2026-11-25');
+assert.equal(appearanceRoot.dataset.palette,appearance.forDate(appearanceNow).palette);
+assert.equal(appearanceRoot.dataset.theme,'light');assert.equal(appearanceRoot.dataset.motion,'off');
+appearanceNow=new Date(2027,0,1);appearanceEvents.pageshow();assert.equal(appearanceRoot.dataset.appearanceDate,'2027-01-01','A restored tab catches up to the current date');
+for(const [year,month,day] of [[2026,2,7],[2026,9,31],[2028,1,28],[2026,11,31]]){
+ const today=appearance.forDate(new Date(year,month,day,0));
+ const late=appearance.forDate(new Date(year,month,day,23,59));
+ const tomorrow=appearance.forDate(new Date(year,month,day+1));
+ assert.equal(JSON.stringify(today),JSON.stringify(late),'Appearance is stable throughout a calendar day');
+ assert.notEqual(today.palette,tomorrow.palette);assert.notEqual(today.artwork,tomorrow.artwork);
+}
+const cycle=Array.from({length:12},(_,offset)=>appearance.forDate(new Date(2026,10,24+offset)));
+assert.equal(new Set(cycle.map(x=>x.palette)).size,3);assert.equal(new Set(cycle.map(x=>x.artwork)).size,4);
+console.log('Passed: daily appearance, midnight refresh, restored tabs, and calendar boundaries.');
