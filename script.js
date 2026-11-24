@@ -96,11 +96,8 @@
  updateMotion();
 
  const mood=document.getElementById('workbench-mood');
- const moods=['sage','blue','peach'];let moodIndex=0;
- mood?.addEventListener('click',()=>{
-  moodIndex=(moodIndex+1)%moods.length;board.dataset.mood=moods[moodIndex];
-  mood.setAttribute('aria-label',`Change workbench color; current color ${moods[moodIndex]}`);
- });
+ window.PortfolioAppearance?.refresh();
+ mood?.addEventListener('click',()=>window.PortfolioAppearance?.cyclePalette());
  const traceButtons=[...document.querySelectorAll('[data-trace]')];
  const isFrontend=document.body.dataset.role==='frontend';
  const traceCopy=isFrontend?{
