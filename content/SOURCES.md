@@ -161,3 +161,34 @@ rockstardev/BTCPayServerPlugins.RockstarDev #81. Added Bitcoin-only PR history u
 explicit repository filter, plus all external public PR history. The history includes
 all PR statuses; selected rows remain verified merged PRs. The older site’s OSS section
 had a generic More on GitHub link. A separate remembered tracker remains unidentified.
+
+
+## Public product previews — 24 November 2026
+
+Opened the live portfolio, https://www.clooza.com/en and https://ipile.xyz/ in the
+browser. Clooza’s product-creation marketing image was exported from its public page:
+`/landing-page/hero/add-product-dark.png` via its Next image endpoint. It is stored as
+`assets/projects/clooza-product.webp`. This is published product imagery, not a claim
+of sole design or implementation authorship. Existing contribution descriptions remain
+the source for personal scope.
+
+Opened https://ipile.xyz/playground and changed the example fee rate from 8 to 2 sat/vB.
+For the displayed 209 vB transaction, the fee changed from 1,672 to 418 sats. Saved the
+public simulator’s main region as `assets/projects/ipile-playground.jpg` and added its
+direct demo link. It requires no account and moves no money. No payments were made,
+no messages were sent, and no wallet was connected. The initial Signet notice changed
+to Mainnet after hydration, so no network availability, custody, performance, or
+production-readiness claim was inferred from the landing page.
+
+Case-study previews use these real public materials; overview cards retain their
+labeled concept artwork. No customer metrics or personal impact figures were inferred.
+
+
+## Clooza product scope — 24 November 2026
+
+The user clarified that Clooza includes event management, product sales, website
+building, and ticketing. These capabilities also appeared on the public Clooza site
+reviewed above. Updated main, frontend, and backend project descriptions, problem
+context, experience summaries, and overview artwork labels to name them explicitly.
+Personal contribution descriptions retain their established engineering scope;
+product capabilities do not imply sole authorship of every module.
