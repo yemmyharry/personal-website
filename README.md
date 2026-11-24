@@ -57,7 +57,8 @@ application attribution, and owner-visit exclusion.
 
 See [content/SOURCES.md](content/SOURCES.md). New public projects were selected by reading
 repository documentation and implementation files. Earlier and assessment work is labeled.
-The illustrations are concepts, not production screenshots. No adoption metrics, testimonials,
+Overview illustrations are labeled concepts. Clooza and Ipilẹ case studies also include
+public product previews with source links; their provenance is recorded in SOURCES.md. No adoption metrics, testimonials,
 original-design authorship, or production-readiness claims have been invented.
 
 ## Contact
@@ -99,3 +100,16 @@ role links and the sitemap keep focused application pages discoverable. Each vie
 a résumé, a direct email link, LinkedIn, and the contact form. The user confirmed that
 contact delivery works on 23 November 2026. Both Qala courses appear on the main and
 Bitcoin views under Courses & credentials.
+
+
+## Daily appearance
+
+`daily-look.js` selects a sage, blue, or peach accent and one of four workbench paper
+patterns (dots, grid, diagonal lines, rings) from the visitor’s local calendar date.
+The same date produces the same look across routes and reloads. Appearance initializes
+before the stylesheet, refreshes at local midnight and on return to the tab, and needs
+no storage, scheduled job, network service, or deployment. Light/dark and motion
+preferences continue to apply. The workbench star cycles the accent for the current
+page; the next page load restores the day’s palette. Only decorative backgrounds and
+tape placement vary; controls and content keep their positions. Without JavaScript,
+the original sage/dotted design remains available.
